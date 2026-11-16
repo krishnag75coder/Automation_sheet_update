@@ -86,3 +86,6 @@ You do not have to type the full `00:00:00` format manually; the tool automatica
 - `1:15:20` ➔ `01:15:20`
 - `45` or `45s` ➔ `00:00:45`
 - `15m` ➔ `00:15:00`
+
+## Live link 
+https://automation-sheet-update.onrender.com/
