@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Production Task Entry Automation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --success-light: #f0fdf4;
+      --danger: #dc2626;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --radius: 10px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f1f5f9;
+      color: var(--gray-800);
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: white;
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-top: 4px solid var(--primary);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-left h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-left p {
+      font-size: 13px;
+      color: var(--gray-600);
+      margin-top: 2px;
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background-color: var(--success-light);
+      color: var(--success);
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-count {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-sync {
+      background: white;
+      border: 1px solid var(--gray-300);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--gray-700);
+      transition: all 0.2s;
+    }
+
+    .btn-sync:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-400);
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      border: 1px solid var(--gray-200);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-600);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--gray-900);
+      background-color: white;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .pill-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      padding: 10px;
+      border: 1.5px solid var(--gray-300);
+      background: var(--gray-50);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      color: var(--gray-700);
+      transition: all 0.15s;
+    }
+
+    .pill-btn:hover {
+      background: var(--gray-100);
+    }
+
+    .pill-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+    }
+
+    .pill-btn.active-green {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+      box-shadow: 0 2px 4px rgba(22, 163, 74, 0.25);
+    }
+
+    .lock-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--gray-50);
+      border-radius: 8px;
+      border: 1px dashed var(--gray-300);
+      margin-top: 18px;
+    }
+
+    .lock-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--gray-300);
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--gray-200);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 16px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Duration Big Input */
+    .duration-input-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .duration-input {
+      width: 100%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center;
+      padding: 16px 20px;
+      border: 2.5px solid var(--primary);
+      border-radius: 12px;
+      background: var(--primary-light);
+      color: var(--gray-900);
+      letter-spacing: 2px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+      transition: all 0.2s;
+    }
+
+    .duration-input:focus {
+      outline: none;
+      border-color: var(--primary-hover);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .duration-preview {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--gray-600);
+      padding: 0 4px;
+    }
+
+    .duration-helper-tag {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--gray-200);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(1px);
+    }
+
+    .btn-submit:disabled {
+      background: var(--gray-400);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Bulk Entry */
+    .bulk-textarea {
+      width: 100%;
+      height: 180px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      padding: 12px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .bulk-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .progress-bar-container {
+      height: 10px;
+      background: var(--gray-200);
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 16px 0;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--success);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Table */
+    .table-responsive {
+      overflow-x: auto;
+      max-height: 380px;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--gray-100);
+      padding: 12px 14px;
+      font-weight: 600;
+      color: var(--gray-700);
+      position: sticky;
+      top: 0;
+      border-bottom: 2px solid var(--gray-200);
+      z-index: 2;
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--gray-800);
+    }
+
+    tr:hover td {
+      background: var(--gray-50);
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .status-pill.success {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-pill.failed {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--gray-900);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #toast.success {
+      background: #15803d;
+    }
+
+    #toast.error {
+      background: #b91c1c;
+    }
+
+    .shortcuts-tip {
+      font-size: 12px;
+      color: var(--gray-600);
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    kbd {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <h1>📊 Production Task Entry Automation</h1>
+        <p>Google Form & Sheet Direct Submitter — Select fixed details once, type timings only.</p>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-success">
+          <span style="font-size: 14px;">●</span> Form & Sheet Connected
+        </span>
+        <span class="badge badge-count" id="session-counter">
+          Session Submissions: 0
+        </span>
+        <button class="btn-sync" onclick="syncFormOptions()" title="Re-fetch options from Google Form">
+          🔄 Sync Form
+        </button>
+        <a href="{{ form_url }}" target="_blank" class="btn-sync" style="text-decoration: none;">
+          ↗ Open Google Form
+        </a>
+      </div>
+    </header>
+
+    <div class="grid-layout">
+      <!-- Left Column: Fixed Details (Select Once) -->
+      <div class="card" id="fixed-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="step-num">1</span> Select Once (Fixed Details)
+          </h2>
+          <span style="font-size: 12px; color: var(--gray-600);">Auto-saved locally</span>
+        </div>
+
+        <form id="fixed-form">
+          <!-- Date -->
+          <div class="form-group">
+            <label class="form-label" for="field-date">Date</label>
+            <input type="date" id="field-date" class="form-control" required>
+          </div>
+
+          <!-- Shift -->
+          <div class="form-group">
+            <label class="form-label">Shift</label>
+            <div class="pill-group" id="shift-group">
+              <button type="button" class="pill-btn active" data-val="Morning">☀️ Morning</button>
+              <button type="button" class="pill-btn" data-val="Evening">🌙 Evening</button>
+            </div>
+            <input type="hidden" id="field-shift" value="Morning">
+          </div>
+
+          <!-- Location -->
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <div class="pill-group" id="location-group">
+              <button type="button" class="pill-btn active-green" data-val="Noida">🏢 Noida</button>
+              <button type="button" class="pill-btn" data-val="Gurugram">🏢 Gurugram</button>
+            </div>
+            <input type="hidden" id="field-location" value="Noida">
+          </div>
+
+          <!-- Camera -->
+          <div class="form-group">
+            <label class="form-label" for="field-camera">Camera</label>
+            <select id="field-camera" class="form-control" required>
+              {% for cam in options.cameras %}
+              <option value="{{ cam }}">{{ cam }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Recorder Name -->
+          <div class="form-group">
+            <label class="form-label" for="field-recorder">Recorder Name</label>
+            <input list="recorder-options" id="field-recorder" class="form-control" placeholder="Search or select recorder..." required>
+            <datalist id="recorder-options">
+              {% for rec in options.recorders %}
+              <option value="{{ rec }}"></option>
+              {% endfor %}
+            </datalist>
+          </div>
+
+          <!-- Scene -->
+          <div class="form-group">
+            <label class="form-label" for="field-scene">Scene ({{ options.scenes|length }} available)</label>
+            <input list="scene-options" id="field-scene" class="form-control" placeholder="Search scene (e.g. reception, pantry)..." required>
+            <datalist id="scene-options">
+              {% for sc in options.scenes %}
+              <option value="{{ sc }}"></option>
+              {% endfor %}
+            </datalist>
+          </div>
+
+          <!-- Task -->
+          <div class="form-group">
+            <label class="form-label" for="field-task">Task ({{ options.tasks|length }} available)</label>
+            <input list="task-options" id="field-task" class="form-control" placeholder="Search task (e.g. Arrange Items, Restock)..." required>
+            <datalist id="task-options">
+              {% for tk in options.tasks %}
+              <option value="{{ tk }}"></option>
+              {% endfor %}
+            </datalist>
+          </div>
+
+          <!-- Lock toggle to prevent accidental changes -->
+          <div class="lock-box">
+            <div class="lock-label">
+              <span>🔒 Lock Fixed Details</span>
+              <span style="font-weight: 400; font-size: 11px; color: var(--gray-600);">(Prevents accidental edits while typing)</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="lock-toggle" onchange="toggleLock(this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Column: Timings Entry (Type Only) -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="step-num">2</span> Timings Entry (Type Timings Only)
+          </h2>
+          <span style="font-size: 12px; color: var(--success); font-weight: 600;">⚡ Ready for Input</span>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('single')">⚡ Rapid Single Entry</button>
+          <button class="tab-btn" onclick="switchTab('bulk')">📋 Bulk Multi-Paste</button>
+          <button class="tab-btn" onclick="switchTab('calc')">⏱️ Start-End Calculator</button>
+        </div>
+
+        <!-- TAB 1: Single Entry -->
+        <div id="tab-single" class="tab-content active">
+          <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px;">
+            Type duration and press <kbd>Enter</kbd>. It submits instantly to the Google Sheet and refocuses for the next timing.
+          </p>
+
+          <form id="single-submit-form" onsubmit="handleSingleSubmit(event)">
+            <div class="duration-input-wrapper">
+              <input 
+                type="text" 
+                id="input-duration" 
+                class="duration-input" 
+                placeholder="00:00:00" 
+                autocomplete="off" 
+                autofocus
+                oninput="handleDurationTyping(this.value)"
+              >
+              <div class="duration-preview">
+                <span>Format: <code class="duration-helper-tag">00:00:00</code></span>
+                <span id="duration-parsed-helper" style="font-weight: 600; color: var(--primary);">Will submit as: 00:00:00</span>
+              </div>
+            </div>
+
+            <!-- Quick duration chips for fast selection -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+              <button type="button" class="btn-sync" onclick="setQuickDuration('00:01:00')">+1 min</button>
+              <button type="button" class="btn-sync" onclick="setQuickDuration('00:02:30')">+2:30</button>
+              <button type="button" class="btn-sync" onclick="setQuickDuration('00:05:00')">+5 min</button>
+              <button type="button" class="btn-sync" onclick="setQuickDuration('00:10:00')">+10 min</button>
+              <button type="button" class="btn-sync" onclick="setQuickDuration('00:15:00')">+15 min</button>
+            </div>
+
+            <button type="submit" id="btn-single-submit" class="btn-submit">
+              <span>🚀 Submit Timing to Google Sheet</span>
+              <kbd style="background: rgba(255,255,255,0.25); border: none; color: white;">↵ Enter</kbd>
+            </button>
+          </form>
+
+          <div class="shortcuts-tip">
+            💡 <strong>Pro-Tip:</strong> You can type shortcuts like <code>4:15</code> (turns to <code>00:04:15</code>), <code>1:10:20</code>, or <code>45</code> (seconds).
+          </div>
+        </div>
+
+        <!-- TAB 2: Bulk Multi-Paste -->
+        <div id="tab-bulk" class="tab-content">
+          <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 8px;">
+            Paste multiple timings from Excel, Notepad, or video logs (one per line). All will be submitted using the fixed details selected on the left.
+          </p>
+          <textarea 
+            id="bulk-input" 
+            class="bulk-textarea" 
+            placeholder="00:02:15&#10;00:04:30&#10;00:01:45&#10;00:06:20&#10;..."
+            oninput="updateBulkCount()"
+          ></textarea>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0 16px 0; font-size: 13px;">
+            <span id="bulk-count-label" style="font-weight: 600; color: var(--primary);">0 timings detected</span>
+            <button type="button" class="btn-sync" onclick="clearBulk()">Clear</button>
+          </div>
+
+          <div class="progress-bar-container" id="bulk-progress-container">
+            <div class="progress-bar-fill" id="bulk-progress-fill"></div>
+          </div>
+
+          <button type="button" id="btn-bulk-submit" class="btn-submit" onclick="handleBulkSubmit()">
+            <span>📋 Submit All Entries to Google Sheet</span>
+          </button>
+        </div>
+
+        <!-- TAB 3: Start-End Calculator -->
+        <div id="tab-calc" class="tab-content">
+          <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px;">
+            Enter start and end timestamps. The duration will be calculated automatically and submitted.
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="form-group">
+              <label class="form-label">Start Time (HH:MM:SS)</label>
+              <input type="text" id="calc-start" class="form-control" placeholder="10:00:00" oninput="calculateDurationAuto()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Time (HH:MM:SS)</label>
+              <input type="text" id="calc-end" class="form-control" placeholder="10:14:30" oninput="calculateDurationAuto()">
+            </div>
+          </div>
+          <div style="background: var(--primary-light); padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 16px;">
+            <div style="font-size: 12px; color: var(--gray-600); text-transform: uppercase;">Calculated Duration</div>
+            <div id="calc-result" style="font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; color: var(--primary);">
+              00:00:00
+            </div>
+          </div>
+          <button type="button" class="btn-submit" onclick="submitCalculatedDuration()">
+            <span>🚀 Submit Calculated Duration to Sheet</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section: Submission History Log -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <span>📜 Google Sheet Submissions Log</span>
+        </h2>
+        <div style="display: flex; gap: 10px;">
+          <a href="/api/download-log" class="btn-sync" style="text-decoration: none;">
+            📥 Export CSV
+          </a>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Date</th>
+              <th>Shift</th>
+              <th>Camera</th>
+              <th>Location</th>
+              <th>Recorder</th>
+              <th>Scene</th>
+              <th>Task</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+            <tr>
+              <td colspan="10" style="text-align: center; color: var(--gray-600); padding: 24px;">
+                No submissions logged in this session yet. Submit a timing above!
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">Entry recorded successfully!</div>
+
+  <!-- Audio Chime (Synthesized AudioContext) -->
+  <script>
+    // Audio feedback using Web Audio API
+    function playSuccessChime() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08); // A5
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {}
+    }
+
+    // App State
+    let sessionCount = 0;
+
+    // Toast Helper
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `show ${type}`;
+      setTimeout(() => {
+        toast.className = '';
+      }, 3000);
+    }
+
+    // Tab switcher
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      if (tab === 'single') {
+        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById('tab-single').classList.add('active');
+        document.getElementById('input-duration').focus();
+      } else if (tab === 'bulk') {
+        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById('tab-bulk').classList.add('active');
+        document.getElementById('bulk-input').focus();
+      } else if (tab === 'calc') {
+        document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
+        document.getElementById('tab-calc').classList.add('active');
+        document.getElementById('calc-start').focus();
+      }
+    }
+
+    // Lock fixed fields
+    function toggleLock(locked) {
+      const inputs = [
+        'field-date', 'field-camera', 'field-recorder', 'field-scene', 'field-task'
+      ];
+      inputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = locked;
+      });
+
+      document.querySelectorAll('#shift-group button, #location-group button').forEach(btn => {
+        btn.disabled = locked;
+      });
+
+      localStorage.setItem('form_locked', locked ? '1' : '0');
+    }
+
+    // Normalizes typed input into 00:00:00 format
+    function normalizeInput(val) {
+      if (!val) return '00:00:00';
+      val = val.trim();
+      const parts = val.split(':').map(p => p.trim());
+      if (parts.length === 3) {
+        const h = String(parseInt(parts[0]) || 0).padStart(2, '0');
+        const m = String(parseInt(parts[1]) || 0).padStart(2, '0');
+        const s = String(parseInt(parts[2]) || 0).padStart(2, '0');
+        return `${h}:${m}:${s}`;
+      } else if (parts.length === 2) {
+        const m = parseInt(parts[0]) || 0;
+        const s = parseInt(parts[1]) || 0;
+        const h = Math.floor(m / 60);
+        const remM = m % 60;
+        return `${String(h).padStart(2, '0')}:${String(remM).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      } else if (parts.length === 1 && /^\d+$/.test(parts[0])) {
+        const num = parts[0];
+        if (num.length === 4) {
+          const m = num.slice(0, 2);
+          const s = num.slice(2, 4);
+          return `00:${m}:${s}`;
+        }
+        const valNum = parseInt(num) || 0;
+        if (valNum < 60) {
+          return `00:00:${String(valNum).padStart(2, '0')}`;
+        } else {
+          const m = Math.floor(valNum / 60);
+          const s = valNum % 60;
+          return `00:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+      }
+      return val;
+    }
+
+    function handleDurationTyping(val) {
+      const helper = document.getElementById('duration-parsed-helper');
+      const normalized = normalizeInput(val);
+      helper.textContent = `Will submit as: ${normalized}`;
+    }
+
+    function setQuickDuration(dur) {
+      const input = document.getElementById('input-duration');
+      input.value = dur;
+      handleDurationTyping(dur);
+      input.focus();
+    }
+
+    // Get all fixed values
+    function getFixedValues() {
+      return {
+        date: document.getElementById('field-date').value,
+        shift: document.getElementById('field-shift').value,
+        location: document.getElementById('field-location').value,
+        camera: document.getElementById('field-camera').value,
+        recorder: document.getElementById('field-recorder').value,
+        scene: document.getElementById('field-scene').value,
+        task: document.getElementById('field-task').value
+      };
+    }
+
+    // Save and load state from localStorage
+    function saveFixedState() {
+      const state = getFixedValues();
+      localStorage.setItem('fixed_form_state', JSON.stringify(state));
+    }
+
+    function loadFixedState() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('field-date').value = today;
+
+      const saved = localStorage.getItem('fixed_form_state');
+      if (saved) {
+        try {
+          const state = JSON.parse(saved);
+          if (state.date) document.getElementById('field-date').value = state.date;
+          if (state.camera) document.getElementById('field-camera').value = state.camera;
+          if (state.recorder) document.getElementById('field-recorder').value = state.recorder;
+          if (state.scene) document.getElementById('field-scene').value = state.scene;
+          if (state.task) document.getElementById('field-task').value = state.task;
+
+          if (state.shift) {
+            document.getElementById('field-shift').value = state.shift;
+            document.querySelectorAll('#shift-group button').forEach(b => {
+              b.classList.toggle('active', b.dataset.val === state.shift);
+            });
+          }
+
+          if (state.location) {
+            document.getElementById('field-location').value = state.location;
+            document.querySelectorAll('#location-group button').forEach(b => {
+              b.classList.toggle('active-green', b.dataset.val === state.location);
+            });
+          }
+        } catch (e) {}
+      }
+
+      if (localStorage.getItem('form_locked') === '1') {
+        document.getElementById('lock-toggle').checked = true;
+        toggleLock(true);
+      }
+    }
+
+    // Single Entry Submit Handler
+    async function handleSingleSubmit(e) {
+      if (e) e.preventDefault();
+      
+      const fixed = getFixedValues();
+      const rawDuration = document.getElementById('input-duration').value.trim();
+      
+      if (!rawDuration) {
+        showToast('Please type a timing duration first!', 'error');
+        document.getElementById('input-duration').focus();
+        return;
+      }
+
+      if (!fixed.recorder || !fixed.scene || !fixed.task) {
+        showToast('Please select Recorder, Scene, and Task on the left!', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('btn-single-submit');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>⏳ Submitting to Google Sheet...</span>`;
+
+      try {
+        const payload = { ...fixed, duration: rawDuration };
+        const resp = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await resp.json();
+
+        if (result.success) {
+          playSuccessChime();
+          showToast(`✅ Recorded ${result.duration} into Sheet!`, 'success');
+          sessionCount++;
+          document.getElementById('session-counter').textContent = `Session Submissions: ${sessionCount}`;
+
+          // Add to log table
+          addHistoryRow(result);
+
+          // Save current fixed selections
+          saveFixedState();
+
+          // Reset duration field and keep focus
+          const durInput = document.getElementById('input-duration');
+          durInput.value = '';
+          durInput.focus();
+          handleDurationTyping('');
+        } else {
+          showToast(`❌ Error: ${result.message}`, 'error');
+        }
+      } catch (err) {
+        showToast(`❌ Network error: ${err.message}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>🚀 Submit Timing to Google Sheet</span> <kbd style="background: rgba(255,255,255,0.25); border: none; color: white;">↵ Enter</kbd>`;
+      }
+    }
+
+    // Bulk Submit Handler
+    function parseBulkDurations() {
+      const text = document.getElementById('bulk-input').value;
+      return text.split(/\r?\n/)
+                 .map(line => line.trim())
+                 .filter(line => line.length > 0);
+    }
+
+    function updateBulkCount() {
+      const list = parseBulkDurations();
+      document.getElementById('bulk-count-label').textContent = `${list.length} timing${list.length === 1 ? '' : 's'} detected`;
+    }
+
+    function clearBulk() {
+      document.getElementById('bulk-input').value = '';
+      updateBulkCount();
+      document.getElementById('bulk-progress-container').style.display = 'none';
+    }
+
+    async function handleBulkSubmit() {
+      const fixed = getFixedValues();
+      const durations = parseBulkDurations();
+
+      if (!durations.length) {
+        showToast('Please paste at least one timing duration!', 'error');
+        return;
+      }
+
+      if (!fixed.recorder || !fixed.scene || !fixed.task) {
+        showToast('Please select Recorder, Scene, and Task on the left!', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('btn-bulk-submit');
+      const progressContainer = document.getElementById('bulk-progress-container');
+      const progressFill = document.getElementById('bulk-progress-fill');
+
+      submitBtn.disabled = true;
+      progressContainer.style.display = 'block';
+      progressFill.style.width = '0%';
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < durations.length; i++) {
+        const dur = durations[i];
+        submitBtn.innerHTML = `<span>⏳ Submitting ${i + 1} of ${durations.length}...</span>`;
+        try {
+          const resp = await fetch('/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...fixed, duration: dur })
+          });
+          const res = await resp.json();
+          if (res.success) {
+            successCount++;
+            sessionCount++;
+            addHistoryRow(res);
+          } else {
+            failCount++;
+          }
+        } catch (e) {
+          failCount++;
+        }
+
+        const pct = Math.round(((i + 1) / durations.length) * 100);
+        progressFill.style.width = `${pct}%`;
+      }
+
+      document.getElementById('session-counter').textContent = `Session Submissions: ${sessionCount}`;
+      saveFixedState();
+      playSuccessChime();
+      showToast(`🎉 Bulk Complete: ${successCount} added to Sheet (${failCount} failed)`, 'success');
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>📋 Submit All Entries to Google Sheet</span>`;
+      document.getElementById('bulk-input').value = '';
+      updateBulkCount();
+    }
+
+    // Start-End Calculator
+    function calculateDurationAuto() {
+      const s = document.getElementById('calc-start').value.trim();
+      const e = document.getElementById('calc-end').value.trim();
+      if (!s || !e) return;
+
+      fetch('/api/calculate-duration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ start: s, end: e })
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          document.getElementById('calc-result').textContent = d.duration;
+        }
+      })
+      .catch(() => {});
+    }
+
+    async function submitCalculatedDuration() {
+      const dur = document.getElementById('calc-result').textContent.trim();
+      if (!dur || dur === '00:00:00') {
+        showToast('Please enter valid Start & End times first!', 'error');
+        return;
+      }
+      document.getElementById('input-duration').value = dur;
+      switchTab('single');
+      handleSingleSubmit();
+    }
+
+    // Add row to live history table
+    function addHistoryRow(item) {
+      const tbody = document.getElementById('history-tbody');
+      if (tbody.children.length === 1 && tbody.children[0].children.length === 1) {
+        tbody.innerHTML = '';
+      }
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family: monospace;">${item.timestamp || new Date().toLocaleTimeString()}</td>
+        <td>${item.date || ''}</td>
+        <td>${item.shift || ''}</td>
+        <td><strong>${item.camera || ''}</strong></td>
+        <td>${item.location || ''}</td>
+        <td>${item.recorder || ''}</td>
+        <td>${item.scene || ''}</td>
+        <td>${item.task || ''}</td>
+        <td style="font-family: monospace; font-weight: 700; color: var(--primary);">${item.duration || ''}</td>
+        <td><span class="status-pill ${item.success ? 'success' : 'failed'}">${item.success ? '✓ Recorded' : 'Failed'}</span></td>
+      `;
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    // Sync options dynamically from live form
+    async function syncFormOptions() {
+      showToast('Syncing options from Google Form...', 'success');
+      try {
+        const resp = await fetch('/api/sync', { method: 'POST' });
+        const data = await resp.json();
+        if (data.status === 'success') {
+          showToast('Form options synchronized successfully!', 'success');
+          setTimeout(() => location.reload(), 800);
+        }
+      } catch (e) {
+        showToast('Failed to sync options: ' + e.message, 'error');
+      }
+    }
+
+    // Setup Event Listeners
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFixedState();
+
+      // Shift Pills
+      document.querySelectorAll('#shift-group button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#shift-group button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('field-shift').value = btn.dataset.val;
+          saveFixedState();
+        });
+      });
+
+      // Location Pills
+      document.querySelectorAll('#location-group button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#location-group button').forEach(b => b.classList.remove('active-green'));
+          btn.classList.add('active-green');
+          document.getElementById('field-location').value = btn.dataset.val;
+          saveFixedState();
+        });
+      });
+
+      // Autosave on change for fixed fields
+      ['field-date', 'field-camera', 'field-recorder', 'field-scene', 'field-task'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('change', saveFixedState);
+          el.addEventListener('input', saveFixedState);
+        }
+      });
+
+      // Load initial history
+      fetch('/api/history')
+        .then(r => r.json())
+        .then(d => {
+          if (d.history && d.history.length > 0) {
+            const tbody = document.getElementById('history-tbody');
+            tbody.innerHTML = '';
+            d.history.forEach(item => {
+              addHistoryRow({
+                timestamp: item.Timestamp,
+                date: item.Date,
+                shift: item.Shift,
+                camera: item.Camera,
+                location: item.Location,
+                recorder: item.Recorder,
+                scene: item.Scene,
+                task: item.Task,
+                duration: item.Duration,
+                success: item.Status === 'Success'
+              });
+            });
+          }
+        })
+        .catch(() => {});
+    });
+  </script>
+</body>
+</html>
